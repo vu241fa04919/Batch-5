@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - HostelCare{% endblock %}
+
+{% block content %}
+<!-- Background Plant Decorations matching the image exactly -->
+<div class="bg-decorations-container">
+    <!-- Top-left hanging plant -->
+    <div class="bg-decor-top-left">
+        <svg viewBox="0 0 160 200" width="100%">
+            <path d="M80,0 L80,40" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="4,4" opacity="0.3"/>
+            <!-- Hanging vines -->
+            <path d="M80,35 Q60,80 50,130 Q40,180 45,200" fill="none" stroke="#4bba8f" stroke-width="2.5"/>
+            <path d="M80,35 Q100,90 110,140 Q120,180 115,200" fill="none" stroke="#6bd2a6" stroke-width="2.5"/>
+            <path d="M80,35 Q85,100 80,160 Q75,190 78,200" fill="none" stroke="#3b9b73" stroke-width="2"/>
+            
+            <!-- Hanging leaves -->
+            <path d="M50,60 Q35,55 45,50 C48,58 46,62 50,60 Z" fill="#4bba8f"/>
+            <path d="M92,70 Q105,75 100,80 C92,80 90,75 92,70 Z" fill="#6bd2a6"/>
+            <path d="M48,100 Q30,105 35,110 C45,110 44,103 48,100 Z" fill="#4bba8f"/>
+            <path d="M108,110 Q125,105 120,115 C110,118 108,112 108,110 Z" fill="#6bd2a6"/>
+            <path d="M52,140 Q38,145 42,152 C50,150 49,143 52,140 Z" fill="#3b9b73"/>
+            <path d="M109,150 Q122,158 116,165 C108,162 108,155 109,150 Z" fill="#6bd2a6"/>
+            <path d="M79,120 Q65,125 70,132 C78,130 77,123 79,120 Z" fill="#3b9b73"/>
+        </svg>
+    </div>
+    
+    <!-- Bottom-left potted plant -->
+    <div class="bg-decor-bottom-left">
+        <svg viewBox="0 0 180 250" width="100%">
+            <!-- Wooden Stand -->
+            <line x1="70" y1="210" x2="50" y2="250" stroke="#d5c8e8" stroke-width="5" stroke-linecap="round"/>
+            <line x1="110" y1="210" x2="130" y2="250" stroke="#d5c8e8" stroke-width="5" stroke-linecap="round"/>
+            <line x1="90" y1="210" x2="90" y2="245" stroke="#bdaecf" stroke-width="4"/>
+            <!-- Plant Stand Table Top -->
+            <ellipse cx="90" cy="210" rx="35" ry="8" fill="#e8ddf7"/>
+            
+            <!-- Ceramic Pink Pot -->
+            <path d="M65,160 L115,160 L105,210 L75,210 Z" fill="#ffe2c9"/>
+            <ellipse cx="90" cy="160" rx="25" ry="5" fill="#fdd2b2"/>
+            
+            <!-- Plant Leaves (Luscious Green) -->
+            <path d="M90,160 C75,120 50,110 30,105 C55,100 80,120 90,160 Z" fill="#4bba8f"/>
+            <path d="M90,160 C65,110 60,70 65,40 C75,70 85,110 90,160 Z" fill="#3b9b73"/>
+            <path d="M90,160 C105,110 120,70 115,40 C105,70 95,110 90,160 Z" fill="#4bba8f"/>
+            <path d="M90,160 C110,120 135,110 150,105 C125,100 100,120 90,160 Z" fill="#6bd2a6"/>
+            <!-- Shading Leaf -->
+            <path d="M90,160 C80,140 100,130 110,145 Z" fill="#318260" opacity="0.3"/>
+        </svg>
+    </div>
+</div>
+
+<div class="dashboard-wrapper">
+    <!-- Top Header matching screenshot exactly -->
+    <header class="main-header animate-fade-in">
+        <div class="header-left">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-menu" aria-label="Open menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <!-- Brand Logo with heart outline -->
+            <div class="brand">
+                <div class="brand-logo-small">
+                    <i class="fa-solid fa-house-chimney-window"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>HostelCare <span class="heart-outline">💖</span></h2>
+                    <p>We care, You stay happy! ✨</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pill-Shaped User Profile Card on the right -->
+        <div class="profile-pill glass" onclick="toggleDropdownMenu(event)">
+            <!-- Notification Bell Icon Wrapper -->
+            <div class="notification-wrapper" onclick="toggleNotifications(event)">
+                <button class="notification-bell" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    {% if unread_count > 0 %}
+                    <span class="bell-badge" id="bell-badge-count">{{ unread_count }}</span>
+                    {% endif %}
+                </button>
+                
+                <!-- Floating Notification Tray (Dropdown) -->
+                <div class="notification-tray shadow glass" id="notification-tray">
+                    <div class="tray-header">
+                        <h4>Notifications</h4>
+                        <button onclick="clearNotifications(event)">Mark all as read</button>
+                    </div>
+                    <div class="tray-body">
+                        {% if notifications %}
+                            {% for notif in notifications %}
+                            <div class="tray-item {% if not notif.is_read %}unread{% endif %}">
+                                <p>{{ notif.message }}</p>
+                                <span class="notif-time">{{ notif.created_at|date:"d M, h:i A" }}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="tray-empty">No notifications</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Inside-Pill Separator line -->
+            <div class="pill-divider"></div>
+            
+            <!-- Profile Avatar and Text details -->
+            <div class="profile-user-info">
+                <div class="avatar-container">
+                    <div class="avatar-image">
+                        <!-- Standard profile icon for Ananya -->
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                </div>
+                <div class="profile-user-details">
+                    <h4>Hi, {{ user.first_name|default:user.username }} 💖</h4>
+                    <p>Room {{ user.room_number|default:"205" }}</p>
+                </div>
+            </div>
+            
+            <!-- Dropdown Chevron Arrow -->
+            <i class="fa-solid fa-chevron-down dropdown-arrow-icon"></i>
+
+            <!-- Floating mini dropdown menu for logging out -->
+            <div class="mini-logout-dropdown glass" id="mini-logout-dropdown">
+                <a href="{% url 'logout' %}" onclick="event.stopPropagation();">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Gradient Banner containing detailed Vector illustration -->
+    <section class="hero-banner animate-fade-in-up">
+        <div class="hero-content">
+            <h1>Hello, {{ user.first_name|default:user.username }}! 👋</h1>
+            <p>Facing an issue? We're here to help.</p>
+            <button class="btn-raise-hero open-raise-modal-btn">
+                Raise a Complaint <span class="plus-icon">+</span>
+            </button>
+        </div>
+        <div class="hero-illustration">
+            <!-- Ultimate High-Fidelity SVG Bedroom Scene matching picture exactly -->
+            <svg viewBox="0 0 450 200" class="hero-svg">
+                <!-- Background Glowing Circle -->
+                <circle cx="280" cy="100" r="85" fill="url(#violet-grad)" opacity="0.5"/>
+                
+                <!-- Hanging Vines from top -->
+                <path d="M220,-20 Q240,40 235,90 M235,30 Q242,45 240,30 M230,60 Q220,75 224,60 M280,-20 Q300,50 310,110 M295,40 Q285,55 290,40 M305,75 Q318,90 312,75" fill="none" stroke="#4bba8f" stroke-width="2"/>
+                <circle cx="235" cy="45" r="4" fill="#3b9b73"/>
+                <circle cx="224" cy="75" r="4.5" fill="#4bba8f"/>
+                <circle cx="290" cy="55" r="4.5" fill="#3b9b73"/>
+                <circle cx="312" cy="90" r="5" fill="#6bd2a6"/>
+
+                <!-- Pictures hanging on the wall with strings -->
+                <!-- Frame 1 -->
+                <line x1="360" y1="30" x2="380" y2="60" stroke="#c5b1e8" stroke-width="1.5"/>
+                <line x1="400" y1="30" x2="380" y2="60" stroke="#c5b1e8" stroke-width="1.5"/>
+                <rect x="365" y="60" width="30" height="36" rx="2" fill="#ffffff" stroke="#eae2fc" stroke-width="1.5"/>
+                <rect x="370" y="65" width="20" height="20" fill="#ffeef2"/>
+                <circle cx="380" cy="72" r="4" fill="#f472b6"/>
+                <path d="M374,82 Q380,78 386,82" fill="none" stroke="#f472b6" stroke-width="1.5"/>
+
+                <!-- Frame 2 -->
+                <line x1="410" y1="60" x2="425" y2="85" stroke="#c5b1e8" stroke-width="1.5"/>
+                <line x1="440" y1="60" x2="425" y2="85" stroke="#c5b1e8" stroke-width="1.5"/>
+                <rect x="412" y="85" width="26" height="32" rx="2" fill="#ffffff" stroke="#eae2fc" stroke-width="1.5" transform="rotate(8 425 101)"/>
+                <rect x="416" y="89" width="18" height="17" fill="#e0f2fe" transform="rotate(8 425 101)"/>
+                
+                <!-- The Bed Setup -->
+                <!-- Bed Base / Mattress -->
+                <path d="M230,150 L430,150 L430,190 L230,190 Z" fill="#ffffff" stroke="#eae2fc" stroke-width="1.5"/>
+                <path d="M230,165 L430,165 L430,190 L230,190 Z" fill="#ffeef2"/> <!-- Sheets pink accent -->
+                <rect x="380" y="130" width="40" height="20" rx="4" fill="#ffffff" stroke="#eae2fc" stroke-width="1.5"/> <!-- Pillow -->
+                
+                <!-- Cute Potted Plant on Table -->
+                <ellipse cx="210" cy="180" rx="16" ry="5" fill="#eae2fc"/>
+                <rect x="202" y="155" width="16" height="25" rx="2" fill="#ffe2c9"/> <!-- Pot -->
+                <path d="M202,155 Q190,135 185,125 Q200,135 202,155" fill="#4bba8f"/>
+                <path d="M218,155 Q230,135 235,125 Q220,135 218,155" fill="#6bd2a6"/>
+                <path d="M210,155 Q210,125 208,115 Q215,125 210,155" fill="#3b9b73"/>
+
+                <!-- High-Fidelity Character: Ananya sitting cross-legged -->
+                <!-- Hair (tied in a high bun) -->
+                <circle cx="320" cy="72" r="14" fill="#3d295f"/> <!-- Hair Bun -->
+                <rect x="316" y="82" width="8" height="6" rx="2" fill="#f472b6"/> <!-- Scrunchie pink -->
+                <path d="M295,110 C295,85 345,85 345,110 C345,125 295,125 295,110 Z" fill="#3d295f"/> <!-- Head Hair -->
+                <circle cx="320" cy="100" r="11" fill="#ffe8e2"/> <!-- Face -->
+                <path d="M298,102 Q320,95 342,102" fill="#3d295f"/> <!-- Hair bangs -->
+                
+                <!-- Body / Hoodie (Purple) -->
+                <path d="M290,175 L350,175 L340,120 L300,120 Z" fill="#8b5cf6" rx="10"/> <!-- Torso -->
+                <path d="M305,120 Q320,135 335,120" fill="#7c3aed" stroke="#ffffff" stroke-width="2"/> <!-- Hoodie Collar -->
+                
+                <!-- Leg cross-legged pants (Black) -->
+                <path d="M280,180 Q320,165 360,180 L350,195 Q320,180 290,195 Z" fill="#231b42"/>
+                <ellipse cx="288" cy="188" rx="8" ry="6" fill="#ffffff"/> <!-- White sock left -->
+                <ellipse cx="352" cy="188" rx="8" ry="6" fill="#ffffff"/> <!-- White sock right -->
+                
+                <!-- Pink Laptop with Heart Outline -->
+                <polygon points="275,150 315,150 322,175 268,175" fill="#f472b6"/> <!-- Base -->
+                <polygon points="275,150 315,150 310,120 280,120" fill="#f43f5e"/> <!-- Screen -->
+                <!-- Little heart on screen back -->
+                <path d="M295,132 C292,128 298,128 295,132 Z" fill="#ffffff"/>
+
+                <!-- Smiling Face Details -->
+                <circle cx="316" cy="100" r="1.5" fill="#3d295f"/> <!-- Eye L -->
+                <circle cx="324" cy="100" r="1.5" fill="#3d295f"/> <!-- Eye R -->
+                <path d="M318,105 Q320,108 322,105" fill="none" stroke="#3d295f" stroke-width="1.5" stroke-linecap="round"/> <!-- Smile -->
+
+                <!-- Heart Floating Message -->
+                <path d="M272,92 C265,77 285,77 278,92 Z" fill="#ff4d73"/>
+                <circle cx="270" cy="104" r="3" fill="#ff4d73" opacity="0.6"/>
+                <circle cx="266" cy="112" r="1.5" fill="#ff4d73" opacity="0.3"/>
+
+                <defs>
+                    <linearGradient id="violet-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e8dcfc"/>
+                        <stop offset="100%" stop-color="#ffeef2"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Stats Cards Row side-by-side matching exactly -->
+    <section class="stats-row">
+        <!-- My Complaints (Blue) -->
+        <div class="stats-card card-blue animate-scale-up" style="--delay: 100ms;">
+            <!-- Swirl accent decoration -->
+            <div class="swirl-decor scroll-blue">
+                <svg viewBox="0 0 100 100" width="100%" height="100%"><path d="M10,80 Q40,30 90,20 Q60,70 10,80" fill="none" stroke="rgba(59, 130, 246, 0.15)" stroke-width="2.5"/></svg>
+            </div>
+            
+            <div class="card-icon">
+                <i class="fa-regular fa-clipboard-list"></i>
+            </div>
+            <div class="card-details">
+                <h3>My Complaints</h3>
+                <span class="stat-number" id="stat-total">{{ total_complaints }}</span>
+            </div>
+            <a href="#complaints-section" class="card-action">View all <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <!-- Pending (Orange/Yellow) -->
+        <div class="stats-card card-orange animate-scale-up" style="--delay: 200ms;">
+            <div class="swirl-decor scroll-orange">
+                <svg viewBox="0 0 100 100" width="100%" height="100%"><path d="M20,90 Q50,40 80,10 Q50,60 20,90" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="2.5"/></svg>
+            </div>
+            
+            <div class="card-icon">
+                <i class="fa-regular fa-hourglass-half"></i>
+            </div>
+            <div class="card-details">
+                <h3>Pending</h3>
+                <span class="stat-number" id="stat-pending">{{ pending_complaints }}</span>
+            </div>
+            <a href="#complaints-section" class="card-action" onclick="filterComplaints('Pending'); event.preventDefault();">View <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <!-- Resolved (Green) -->
+        <div class="stats-card card-green animate-scale-up" style="--delay: 300ms;">
+            <div class="swirl-decor scroll-green">
+                <svg viewBox="0 0 100 100" width="100%" height="100%"><path d="M10,10 Q80,40 90,90 Q40,60 10,10" fill="none" stroke="rgba(16, 185, 129, 0.15)" stroke-width="2.5"/></svg>
+            </div>
+            
+            <div class="card-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <div class="card-details">
+                <h3>Resolved</h3>
+                <span class="stat-number" id="stat-resolved">{{ resolved_complaints }}</span>
+            </div>
+            <a href="#complaints-section" class="card-action" onclick="filterComplaints('Resolved'); event.preventDefault();">View <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </section>
+
+    <!-- Lower Panels side-by-side matching exactly -->
+    <div class="dashboard-grid">
+        <!-- Quick Actions Panel -->
+        <section class="quick-actions-panel animate-fade-in-up" style="--delay: 400ms;">
+            <h2 class="section-title">Quick Actions <span class="sparkle-gold">✨</span></h2>
+            
+            <div class="action-buttons-grid">
+                <button class="action-btn purple-btn open-raise-modal-btn">
+                    <div class="btn-icon">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+                    <span>Raise Complaint</span>
+                </button>
+                
+                <a href="#complaints-section" class="action-btn blue-btn" onclick="resetFilters()">
+                    <div class="btn-icon">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    </div>
+                    <span>Track Complaint</span>
+                </a>
+                
+                <button class="action-btn pink-btn" onclick="openWardenModal()">
+                    <div class="btn-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <span>Contact Warden</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- My Recent Complaints Panel -->
+        <section id="complaints-section" class="recent-complaints-panel animate-fade-in-up" style="--delay: 500ms;">
+            <div class="section-header">
+                <h2 class="section-title">My Recent Complaints</h2>
+                <button class="see-all-btn" onclick="resetFilters()">See all</button>
+            </div>
+
+            <div class="complaints-list" id="complaints-list">
+                {% if recent_complaints %}
+                    {% for complaint in recent_complaints %}
+                    <div class="complaint-card filter-item {{ complaint.status }}" id="complaint-{{ complaint.id }}" onclick="toggleRemarks({{ complaint.id }})">
+                        <div class="complaint-left">
+                            <div class="category-icon icon-{{ complaint.category|slugify }}">
+                                {% if complaint.category == 'Electrical' %}
+                                    <i class="fa-regular fa-lightbulb"></i>
+                                {% elif complaint.category == 'Plumbing' %}
+                                    <i class="fa-solid fa-droplet"></i>
+                                {% elif complaint.category == 'Housekeeping' %}
+                                    <i class="fa-solid fa-broom"></i>
+                                {% elif complaint.category == 'Internet/Wi-Fi' %}
+                                    <i class="fa-solid fa-wifi"></i>
+                                {% elif complaint.category == 'Mess/Food' %}
+                                    <i class="fa-solid fa-utensils"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-circle-info"></i>
+                                {% endif %}
+                            </div>
+                            <div class="complaint-main">
+                                <h3>{{ complaint.title }}</h3>
+                                <p class="complaint-date">
+                                    {{ complaint.created_at|date:"d M Y • h:i A" }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="complaint-right">
+                            <span class="badge {% if complaint.status == 'Resolved' %}badge-resolved{% elif complaint.status == 'In Progress' %}badge-progress{% else %}badge-pending{% endif %}">
+                                {{ complaint.status }}
+                            </span>
+                            <i class="fa-solid fa-chevron-down expand-indicator"></i>
+                        </div>
+                        
+                        <!-- Collapsible Remarks drawer -->
+                        <div class="remarks-drawer" id="remarks-{{ complaint.id }}">
+                            <div class="drawer-content">
+                                <strong>Description:</strong>
+                                <p>{{ complaint.description }}</p>
+                                
+                                {% if complaint.warden_remarks %}
+                                <div class="warden-remarks-box">
+                                    <strong>Warden Remarks:</strong>
+                                    <p>{{ complaint.warden_remarks }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <p>No complaints raised yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Centered footer priority text matching exactly -->
+    <div class="priority-footer animate-fade-in-up" style="--delay: 550ms;">
+        <span>✨</span> Your comfort is our priority <span class="heart-icon-purple">💜</span> <span>✨</span>
+    </div>
+
+    <!-- MODAL: Raise Complaint -->
+    <div class="modal-overlay glass" id="raise-modal">
+        <div class="modal-card animate-scale-up">
+            <div class="modal-header">
+                <h2>Raise a Complaint 📝</h2>
+                <button class="close-modal-btn" onclick="closeRaiseModal()">&times;</button>
+            </div>
+            <form id="raise-complaint-form" class="modal-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select name="category" id="category" required>
+                        <option value="" disabled selected>Select issue category</option>
+                        {% for cat_val, cat_name in categories %}
+                        <option value="{{ cat_val }}">{{ cat_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Title / Issue Summary</label>
+                    <input type="text" name="title" id="title" placeholder="e.g., Water leakage in Room 205 bathroom" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Detailed Description</label>
+                    <textarea name="description" id="description" rows="4" placeholder="Explain the problem in detail so the technician can understand..." required></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeRaiseModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">
+                        Submit Complaint <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Contact Warden -->
+    <div class="modal-overlay glass" id="warden-modal">
+        <div class="modal-card animate-scale-up">
+            <div class="modal-header">
+                <h2>Contact Warden 📞</h2>
+                <button class="close-modal-btn" onclick="closeWardenModal()">&times;</button>
+            </div>
+            <div class="warden-contact-details">
+                <div class="warden-info-card">
+                    <div class="warden-avatar">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h3>Warden Sheela Devi</h3>
+                    <p>Lotus Block A Warden Office</p>
+                </div>
+
+                <div class="contact-methods">
+                    <a href="tel:+919876543211" class="contact-method-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <div>
+                            <h4>Call Office</h4>
+                            <p>+91 98765 43211</p>
+                        </div>
+                    </a>
+                    
+                    <a href="mailto:sheela@hostel.edu" class="contact-method-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <div>
+                            <h4>Email Warden</h4>
+                            <p>sheela@hostel.edu</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel btn-wide" onclick="closeWardenModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Custom Dashboard Javascript -->
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

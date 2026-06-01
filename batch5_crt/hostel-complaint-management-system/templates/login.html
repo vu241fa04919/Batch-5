@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - HostelCare{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-bg-decorations">
+        <div class="blob-1"></div>
+        <div class="blob-2"></div>
+    </div>
+    
+    <div class="login-card glass">
+        <div class="login-header">
+            <div class="brand-logo">
+                <i class="fa-solid fa-house-chimney-window"></i>
+                <div class="brand-sparkle">❤️</div>
+            </div>
+            <h1>HostelCare</h1>
+            <p>We care, You stay happy! ✨</p>
+        </div>
+        
+        <form method="POST" class="login-form">
+            {% csrf_token %}
+            
+            {% if error_message %}
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ error_message }}
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-regular fa-key"></i>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-primary login-btn">
+                Log In <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </form>
+        
+        <div class="demo-accounts">
+            <h3>Quick Demo Access</h3>
+            <div class="demo-buttons">
+                <button type="button" class="demo-btn student-demo" onclick="fillCredentials('ananya', 'ananya123')">
+                    Student (Ananya)
+                </button>
+                <button type="button" class="demo-btn warden-demo" onclick="fillCredentials('warden_sheela', 'warden123')">
+                    Warden (Sheela)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function fillCredentials(username, password) {
+        document.getElementById('username').value = username;
+        document.getElementById('password').value = password;
+        
+        // Add visual micro-animation trigger
+        const card = document.querySelector('.login-card');
+        card.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            card.style.transform = 'scale(1)';
+        }, 100);
+    }
+</script>
+{% endblock %}
